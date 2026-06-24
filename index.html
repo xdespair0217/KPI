@@ -68,8 +68,29 @@
             font-size: 0.75rem;
             color: var(--text-muted);
             margin-top: 0.5vh;
+            display: flex;
+            align-items: center;
         }
         .header-meta span { color: var(--accent-blue); margin-right: 12px; }
+
+        .global-kpi-btn {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 229, 255, 0.05);
+            color: var(--accent-blue);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 0.72rem;
+            text-decoration: none;
+            margin-left: 15px;
+            transition: all 0.2s ease;
+        }
+        .global-kpi-btn:hover {
+            background: rgba(0, 229, 255, 0.15);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+        }
 
         .critical-badge {
             background: rgba(255, 145, 0, 0.08);
@@ -187,7 +208,6 @@
         }
         .footer-notes span strong { color: #fff; }
 
-        /* 燈箱外層固定架構 */
         .popup-overlay {
             display: none;
             position: fixed;
@@ -199,19 +219,30 @@
             align-items: center;
         }
 
-        /* 彈出視窗容器 */
         .popup-content {
             background: #0f1626;
             border: 1px solid var(--accent-blue);
             box-shadow: 0 0 25px rgba(0, 229, 255, 0.2);
             border-radius: 4px;
             width: 85%;
-            max-width: 650px; /* 有PDF預覽時，稍微拓寬容器 */
-            max-height: 85vh; /* 限制最高高度 */
+            max-width: 650px; 
+            max-height: 85vh; 
             padding: 20px;
             position: relative;
             display: flex;
             flex-direction: column;
+        }
+
+        #imagePopup.popup-overlay {
+            z-index: 1200;
+            background: rgba(2, 3, 7, 0.95);
+        }
+        #imagePopup .popup-content {
+            max-width: 500px;
+            height: 80vh;
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 25px rgba(255, 145, 0, 0.2);
+            padding: 15px;
         }
 
         .close-btn {
@@ -229,21 +260,38 @@
             margin-bottom: 12px;
         }
 
-        /* PDF 內嵌容器樣式 */
-        .pdf-viewer-container {
+        .media-viewer-container {
             width: 100%;
-            height: 400px; /* 給予適當流暢的瀏覽高度 */
+            height: 380px; 
             border: 1px solid #1e2d4a;
             margin-top: 10px;
             background: #000;
             border-radius: 4px;
-            overflow: hidden;
+            overflow-y: auto; 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .image-popup-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
         .pdf-iframe {
             width: 100%;
             height: 100%;
             border: none;
+        }
+
+        .embedded-img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
         }
 
         .kpi-criterion {
@@ -263,10 +311,11 @@
             <h2>服務顧問接待流程 KPI 稽核管制看板</h2>
             <div class="header-meta">
                 負責人：<span>尚鵬內湖廠長 謝或翰</span> 系統編入時間：<span>2026-06-23</span>
+                <a href="https://drive.google.com/file/d/1MVC1RunZpz4L_Ed0PD8CyCm5YJCZeZqf/view?usp=sharing" target="_blank" class="global-kpi-btn">📋 檢視經銷商 KPI 總檢核表 (PDF)</a>
             </div>
         </div>
-        <div class="critical-badge">
-            <strong>CRITICAL</strong> 發貨驗收單「原廠問題」+ 新凱「新問題」：訂單車必須須立即優先處理
+        <div class="critical-badge" id="countdownBadge">
+            <strong>KPI COUNTDOWN</strong> 距離 7 月底 APP 稽核大會戰還有 <span id="countdownDays" style="color:var(--accent-blue); font-weight:bold; font-size:0.85rem;">--</span> 天
         </div>
     </div>
 
@@ -394,6 +443,16 @@
         </div>
     </div>
 
+    <div id="imagePopup" class="popup-overlay" onclick="closeImagePopupOnOutside(event)">
+        <div class="popup-content">
+            <button class="close-btn" onclick="closeImagePopup()">&times;</button>
+            <div class="popup-header"><h3 style="margin:0; color:var(--accent-orange); font-size:0.95rem;">反映案例照片 (A04)</h3></div>
+            <div class="image-popup-container" id="globalImageContainer">
+                <!-- 動態加載，避免硬體預載過載 -->
+            </div>
+        </div>
+    </div>
+
     <script>
         const nodeData = {
             node1: { 
@@ -404,13 +463,94 @@
             node2: { 
                 title: "02. 標準服務流程演練", 
                 desc: "<strong>大標準服務流程：</strong>SA 須落實接待 SOP 核心對答、標準禮儀與流程演練。<br><br><a href='https://drive.google.com/file/d/14zCAZT3w8y69QujT0RYl-jAyf_MLB003/view?usp=sharing' target='_blank' style='display:inline-block; background:#1c3d31; color:#00e676; border:1px solid #00e676; padding:4px 10px; border-radius:3px; font-size:0.72rem; text-decoration:none;'>📥 下載原始檔案</a>", 
-                pdfUrl: "https://drive.google.com/file/d/14zCAZT3w8y69QujT0RYl-jAyf_MLB003/preview", // 轉為內嵌預報格式
+                pdfUrl: "https://drive.google.com/file/d/14zCAZT3w8y69QujT0RYl-jAyf_MLB003/preview", 
                 criterion: "<strong>【KPI 合格判定】</strong><br>現場抽查演練流暢度，需符合隨後檢附之 PDF 標準規範指南。" 
             },
-            node3: { title: "03. 預約車入廠電話提醒及記錄", desc: "<strong>防呆機制：</strong>預約日前 1~2 天聯繫。電話未通者，必須於 1 小時內補發提醒簡訊並存檔。", criterion: "<strong>【KPI 合格判定】</strong><br>DMS 系統內必須完整留存通聯軌跡與簡訊發送紀錄（內含時間與預約時段），無紀錄者判定不合格。" },
-            node4: { title: "04. 車輛接車時鋪設椅套、方向盤套、腳踏墊", desc: "<strong>核心防護：</strong>SA 身體碰觸車室內部前，必須第一時間完整鋪設防護三件套。", criterion: "<strong>【KPI 合格判定】</strong><br>現場抽查車輛移動時，三件套皆完備、乾淨且無破損。未套防護即坐進車內者一律不合格。" },
-            node5: { title: "05. 使用 iPad 平板接車及報價", desc: "<strong>數位核心：</strong>手持 iPad 進行外觀環車巡檢，並於系統導入報價套餐供客戶數位簽名。", criterion: "<strong>【KPI 合格判定】</strong><br>接待全程實施無紙化數位作業，外觀拍照與報價單皆有系統端即時存檔。仍使用紙張劃單者判定不合格。" },
-            node6: { title: "06. 是否使用標準規範的文件", desc: "<strong>文件整備：</strong>新版保養靜電貼紙（註明下次里程與日期）、結帳信封袋（工單與發票需整齊收納）。", criterion: "<strong>【KPI 合格判定】</strong><br>完工交車前，貼紙字跡工整定位，文件統一收入標準信封袋。散落或使用舊版文件者視為不合格。" }
+            node3: { 
+                title: "03. 預約車入廠電話提醒及記錄（如電話不通需發簡訊提醒並記錄）", 
+                desc: "<strong>防呆機制：</strong>預約日前 1~2 天聯繫及提醒簡訊並存檔。", 
+                imgUrl: "https://raw.githubusercontent.com/xdespair0217/KPI/main/A01.png", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>DMS 系統內必須完整留存軌跡與簡訊發送紀錄（內含時間與預約時段），無紀錄者判定不合格。" 
+            },
+            node4: { 
+                title: "04. 車輛接車時鋪設椅套、方向盤套、腳踏墊", 
+                desc: "<strong>核心防護：</strong>SA 接車前，必須第一時間完整鋪設防護三件套。", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>現場抽查車輛移動時，三件套皆完備、乾淨且無破損。未套防護即坐進車內者一律不合格。" 
+            },
+            node5: { 
+                title: "05. 使用 iPad 平板接車及報價", 
+                desc: "<strong>數位核心：</strong>手持 iPad 進行外觀環車巡檢，並於系統導入報價套餐供客戶數位簽名。", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>接待全程實施無紙化數位作業，外觀拍照與報價單皆有系統端即時存檔。" 
+            },
+            node6: { 
+                title: "06. 是否使用標準規範的文件", 
+                desc: "<strong>文件整備：</strong>新版保養靜電貼紙（註明下次里程與日期）、結帳信封袋（工單與發票需整齊收納）。", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>完工交車前，貼紙字跡工整定位，文件統一收入標準信封袋。散落或使用舊版文件者視為不合格。" 
+            },
+            node7: { 
+                title: "07. 出廠 3 日 DC 電訪追蹤並紀錄", 
+                desc: "<strong>核心重點：</strong>落實出廠三日 DC 電訪追蹤，確認客戶用車狀況並確實執行結案程序。", 
+                imgUrl: "https://raw.githubusercontent.com/xdespair0217/KPI/main/A02.png", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>必須依規範完成電訪軌跡紀錄，且確認該案件已完備結案。" 
+            },
+            node8: { 
+                title: "08. 服務顧問於 30 秒內找出專案內容", 
+                desc: "<strong>核心速度測試：</strong>SA 須具備熟練的專案檢索能力，於時限內完成專案內容核對。<br><br><a href='https://script.google.com/macros/s/AKfycbztmbCrEtk0DZVIKSvFcfrAWTI_kie2Od6YDzo8HqEUHPjYAeZVcv0STi2kxnykrlQ7NQ/exec?mode=tech' target='_blank' style='display:inline-block; background:#1e2d4a; color:#00e5ff; border:1px solid #00e5ff; padding:4px 10px; border-radius:3px; font-size:0.72rem; text-decoration:none;'>🔗 啟動專案即時查詢系統</a>", 
+                imgUrl: "https://raw.githubusercontent.com/xdespair0217/KPI/main/A03.png", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>現場抽查測試，SA 須在 30 秒內流暢找出指定的專案詳細內容。" 
+            },
+            node9: { 
+                title: "09. 服務顧問可以進入 Link-e-entry 並了解功能", 
+                desc: "<strong>🔑 【核心登入資訊】</strong><br>" +
+                      "▪️ 帳號：<span id='accText' style='color:#fff; font-weight:bold;'>TW-I482000.D037</span> " +
+                      "<button onclick='event.stopPropagation(); navigator.clipboard.writeText(\"TW-I482000.D037\"); alert(\"帳號已複製\");' style='background:#1e2d4a; color:#00e5ff; border:1px solid #00e5ff; padding:2px 6px; border-radius:3px; font-size:0.65rem; cursor:pointer; margin-left:5px;'>📋 複製帳號</button><br>" +
+                      "▪️ 密碼：<span id='pwdText' style='color:#fff; font-weight:bold;'>ZZZ.zzz33</span> " +
+                      "<button onclick='event.stopPropagation(); navigator.clipboard.writeText(\"ZZZ.zzz33\"); alert(\"密碼已複製\");' style='background:#1e2d4a; color:#00e5ff; border:1px solid #00e5ff; padding:2px 6px; border-radius:3px; font-size:0.65rem; cursor:pointer; margin-left:5px;'>📋 複製密碼</button><br>" +
+                      "▪️ 經銷商代碼：<span style='color:#fff; font-weight:bold;'>53539</span><br><br>" +
+                      "<strong>🌐 【Link e Entry 服務入口】</strong><br>" +
+                      "<a href='https://linkentry.fiat.com/' target='_blank' style='display:inline-block; background:#1c3d31; color:#00e676; border:1px solid #00e676; padding:4px 10px; border-radius:3px; font-size:0.72rem; text-decoration:none; margin-top:5px; margin-bottom:10px;'>🌐 進入 Link e Entry 系統</a><br>" +
+                      "(登入後可切換以下功能：)<br><br>" +
+                      "⚙️ <strong>ePER (查零件資料)</strong><br>📂 路徑：Aftersales ➔ After sales Menu ➔ ePER<br><br>" +
+                      "📖 <strong>eLearn (服務資訊/技術程序/學習)</strong><br>📂 路徑：Aftersales ➔ After sales Menu ➔ eLEARN<br><br>" +
+                      "⏱️ <strong>Tempario (工時資訊)</strong>", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>SA 須能熟練登入 Link e Entry 系統，並在要求下精準切換至 ePER、eLearn、Tempario 執行對應查詢作業。" 
+            },
+            node10: { 
+                title: "10. 服務顧問了解最新 PGU 活動或廠內自辦活動", 
+                desc: "<strong>❄️ 【目前活動：冷氣健診活動】</strong><br>" +
+                      "📅 <strong>活動期間：</strong>2026/06/15 ～ 2026/08/31<br><br>" +
+                      "🔥 <strong>夏季限定優惠：</strong><br>" +
+                      "💨 優惠一｜冷氣清潔超值組（冷氣風箱清潔＋空調濾網套裝）特價 $1,388 / $1,688 / $1,988<br>" +
+                      "🔧 優惠二｜冷氣系統零件優惠（壓縮機、蒸發器、冷凝器、乾燥瓶、鼓風機）✨ 指定零件全面 85 折<br><br>" +
+                      "🎒 <strong>廠內自辦加碼送（核心差異）：</strong><br>" +
+                      "▪️ 總代理規範：單筆消費滿 $6,888 即贈 brand 限量防水袋乙個（數量有限，送完為止）。<br>" +
+                      "▪️ <span style='color:#00e5ff; font-weight:bold;'>廠內自辦限定：只要有保養，一律直接贈送防水袋乙個！</span><br><br>" +
+                      "🎫 <strong>消費再抽好禮：</strong><br>" +
+                      "🏟️ 返廠消費抽味全龍主場例行賽門票<br>" +
+                      "🔥 消費滿 $30,000 再抽天母球場「龍焰燒烤席」<br><br>" +
+                      "<a href='https://xdespair0217.github.io/2026AC/' target='_blank' style='display:inline-block; background:#1e2d4a; color:#00e5ff; border:1px solid #00e5ff; padding:4px 10px; border-radius:3px; font-size:0.72rem; text-decoration:none;'>🌐 點此進入冷氣健診活動網頁</a>", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>SA 須能精準背誦冷氣健診活動時間與兩大核心優惠套餐，並主動向保養客戶告知廠內『只要保養就送防水袋』的自辦加碼福利。" 
+            },
+            node11: { 
+                title: "11. 服務顧問了解 My Peugeot APP 系統及客戶問題反映程序", 
+                desc: "<strong>📱 【My Peugeot App 核心資訊與工具】</strong><br>" +
+                      "<a href='https://docs.google.com/presentation/d/1JlWn6o0EfBWens1Ul8tZJt3t5ZrtgJTI/edit?usp=sharing&ouid=102482519529125762788&rtpof=true&sd=true' target='_blank' style='display:inline-block; background:#1e2d4a; color:#00e5ff; border:1px solid #00e5ff; padding:3px 8px; border-radius:3px; font-size:0.72rem; text-decoration:none; margin-bottom:8px;'>🖥️ 瀏覽 My Peugeot App 功能簡報 (PPT)</a><br>" +
+                      "<a href='https://drive.google.com/file/d/1ut_vHPDF5EW2knkm73Vqi6WHiVYcwe9e/view?usp=sharing' target='_blank' style='display:inline-block; background:#1e2d4a; color:#00e5ff; border:1px solid #00e5ff; padding:3px 8px; border-radius:3px; font-size:0.72rem; text-decoration:none; margin-bottom:8px;'>🎥 檢視 MY APP 實作案例檔案</a><br>" +
+                      "<button onclick='event.stopPropagation(); openImagePopup();' style='background:#1e2d4a; color:#ff9100; border:1px solid #ff9100; padding:3px 8px; border-radius:3px; font-size:0.72rem; cursor:pointer; margin-bottom:8px; display:inline-block;'>🖼️ 點開車主反映案例照片 (A04)</button><br>" +
+                      "<a href='https://docs.google.com/spreadsheets/d/12K5xu2_t9VuB9PHiQm5gYINwQlKbhvq3/edit?usp=sharing&ouid=102482519529125762788&rtpof=true&sd=true' target='_blank' style='display:inline-block; background:#1c3d31; color:#00e676; border:1px solid #00e676; padding:3px 8px; border-radius:3px; font-size:0.72rem; text-decoration:none; margin-bottom:12px;'>📊 下載 My Peugeot APP 回報格式 (Excel)</a><br>" +
+                      "<span style='color:#ff9100; font-weight:bold;'>⚠️ 系統防呆備註：關於過往客戶收不到驗證簡訊之 NCC 限制部分，後續已全數排除解決，此問題無須再重複通報。</span><br><br>" +
+                      "<strong>🛠️ 【車主問題回報流程（廠長建議標準操作）】</strong><br>" +
+                      "1️⃣ <strong>建議先加官方 LINE 方便照片資料控管</strong><br>引導車主先加入官方 LINE，方便傳送圖片與即時訊息（LINE ID：<span style='color:#00e676; font-weight:bold;'>@g-lion-neihu</span>）。<br><br>" +
+                      "2️⃣ <strong>依 APP 操作回饋問題</strong><br>車主依 APP 內操作回饋問題，完成後請 SA 協助車主<strong>截圖保存</strong>回饋內容。<br><br>" +
+                      "3️⃣ <strong>補充總代理資訊，整理並寄送回報</strong><br>若需要總代理相關資訊，請車主一併提供。將以上資料完整整理後進行郵件通報：<br>" +
+                      "▪️ <strong>正本收件人：</strong>PGU / 劉益青 Benson 📧 <span style='color:#fff;'>benson.liu@pgu.com.tw</span><br>" +
+                      "▪️ <strong>副本收件人：</strong>PGU / 翁士航 Austin WENG 📧 <span style='color:#fff;'>austin.weng@pgu.com.tw</span><br><br>" +
+                      "🏷️ <strong>標準郵件主旨格式範例：</strong><br>" +
+                      "<span id='mailSubject' style='color:#fff; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:3px; font-size:0.72rem; border:1px dashed #3b4f74;'>111AW-CAP5936-VR3FPHPY1SY541285-無法收到驗證碼</span> " +
+                      "<button onclick='event.stopPropagation(); navigator.clipboard.writeText(\"111AW-CAP5936-VR3FPHPY1SY541285-無法收到驗證碼\"); alert(\"主旨格式已複製\");' style='background:#1e2d4a; color:#00e5ff; border:1px solid #00e5ff; padding:1px 5px; border-radius:3px; font-size:0.62rem; cursor:pointer; vertical-align:middle;'>📋 複製格式</button> " +
+                      "<button onclick='event.stopPropagation(); window.location.href=\"mailto:benson.liu@pgu.com.tw?cc=austin.weng@pgu.com.tw&subject=\" + encodeURIComponent(\"111AW-CAP5936-VR3FPHPY1SY541285-無法收到驗證碼\") + \"&body=\" + encodeURIComponent(\"長官好，已將車主的所有資訊，添加至附件中請求長官支援。\");' style='background:#1a3d54; color:#00e5ff; border:1px solid #00e5ff; padding:1px 5px; border-radius:3px; font-size:0.62rem; cursor:pointer; vertical-align:middle;'>📧 自動產生通報郵件</button>", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>SA 抽查時須了解 APP 基礎功能操作，並熟知車主回報 3 步驟流程。寄送 PGU 通報郵件時，主旨與收件人規格須完全符合廠內規範。" 
+            }
         };
 
         function openPopup(nodeId) {
@@ -421,12 +561,19 @@
                     <p style="color:var(--text-muted); font-size:0.8rem;">細節內容尚待設定。</p>
                 `;
             } else {
-                // 判斷該節點是否有內嵌 PDF 需求
-                let pdfHtml = "";
+                let mediaHtml = "";
                 if (data.pdfUrl) {
-                    pdfHtml = `
-                        <div class="pdf-viewer-container">
+                    // 動態生成 iframe，確保不預先載入
+                    mediaHtml = `
+                        <div class="media-viewer-container">
                             <iframe src="${data.pdfUrl}" class="pdf-iframe" allow="autoplay"></iframe>
+                        </div>
+                    `;
+                } else if (data.imgUrl) {
+                    // 動態生成圖片，避免手機背景記憶體過載
+                    mediaHtml = `
+                        <div class="media-viewer-container">
+                            <img src="${data.imgUrl}" class="embedded-img" alt="SOP 說明圖">
                         </div>
                     `;
                 }
@@ -436,14 +583,47 @@
                         <h3 style="margin:0; color:var(--accent-blue); font-size:0.95rem;">${data.title}</h3>
                     </div>
                     <p style="line-height:1.5; color:#a2b4d0; font-size:0.82rem; margin-bottom:10px;">${data.desc}</p>
-                    ${pdfHtml}
+                    ${mediaHtml}
                     <div class="kpi-criterion">${data.criterion}</div>
                 `;
             }
             document.getElementById('detailPopup').style.display = 'flex';
         }
-        function closePopup() { document.getElementById('detailPopup').style.display = 'none'; }
+
+        // 徹底釋放 iframe 與內容記憶體，防止移動端當機
+        function closePopup() { 
+            const viewer = document.querySelector('.pdf-iframe');
+            if(viewer) viewer.src = "about:blank"; // 阻斷緩存
+            document.getElementById('popupBody').innerHTML = ""; // 物理清空 DOM 節點
+            document.getElementById('detailPopup').style.display = 'none'; 
+        }
         function closePopupOnOutside(e) { if (e.target.id === 'detailPopup') closePopup(); }
+
+        // 第二層大圖燈箱動態加載機制
+        function openImagePopup() { 
+            document.getElementById('globalImageContainer').innerHTML = `<img src="https://raw.githubusercontent.com/xdespair0217/KPI/main/A04.jpg" class="embedded-img" alt="車主案例照片">`;
+            document.getElementById('imagePopup').style.display = 'flex'; 
+        }
+        function closeImagePopup() { 
+            document.getElementById('globalImageContainer').innerHTML = ""; // 物理銷毀大圖記憶體
+            document.getElementById('imagePopup').style.display = 'none'; 
+        }
+        function closeImagePopupOnOutside(e) { if (e.target.id === 'imagePopup') closeImagePopup(); }
+
+        function calculateCountdown() {
+            const targetDate = new Date("2026-07-31T23:59:59").getTime();
+            const now = new Date().getTime();
+            const timeDifference = targetDate - now;
+
+            if (timeDifference <= 0) {
+                document.getElementById("countdownBadge").innerHTML = "<strong>CRITICAL</strong> 7月底 KPI 稽核作戰期限已屆滿";
+            } else {
+                const daysRemaining = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+                document.getElementById("countdownDays").innerText = daysRemaining;
+            }
+        }
+        
+        calculateCountdown();
     </script>
 </body>
 </html>
