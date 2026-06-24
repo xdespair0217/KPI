@@ -61,7 +61,7 @@
             height: 1.3rem;
             background: var(--accent-blue);
             margin-right: 10px;
-            box-Shadow: 0 0 8px var(--accent-blue);
+            box-shadow: 0 0 8px var(--accent-blue);
         }
 
         .header-meta {
@@ -304,59 +304,47 @@
         }
 
         /* =======================================================
-          🔥 補強精準攻堅：徹底釋放手機端卡片與長燈箱的滾動條
+          🔥 核心單點攻堅：手機端防禦性 RWD 補強 (桌機端完全無感)
           =======================================================
         */
         @media screen and (max-width: 768px) {
             html, body {
-                height: auto;          
-                overflow-y: auto !important; /* 確保主畫面在手機端可以順暢往下滑動 */
+                height: auto;          /* 解開高度死結 */
+                overflow-y: auto;      /* 允許手機端大頁面上下滑動 */
             }
             body {
-                padding: 2vh 3vw;      
+                padding: 2vh 3vw;      /* 手機端稍微收緊外距 */
             }
             .system-header {
-                flex-direction: column;
+                flex-direction: column;/* 標題與倒數計時改垂直排列，避免擠壓 */
                 align-items: stretch;
                 gap: 10px;
             }
             .header-meta {
-                flex-direction: column;
+                flex-direction: column;/* 廠長資訊與總檢核表按鈕改垂直 */
                 align-items: flex-start;
                 gap: 8px;
             }
             .global-kpi-btn {
-                margin-left: 0;        
+                margin-left: 0;        /* 歸零靠左 */
             }
             .matrix-grid {
-                grid-template-columns: 1fr; /* 手機端自動切換為一單列，完美舒緩空間 */
+                grid-template-columns: 1fr; /* 12宮格在手機上自動改為單一直列，極致流暢 */
                 grid-template-rows: auto;
                 gap: 15px;
                 margin-bottom: 20px;
             }
             .flow-node {
-                height: auto;          
+                height: auto;          /* 卡片高度隨文字自適應 */
                 padding: 15px;
             }
-            
-            /* 🎯 關鍵修復：破除長內容彈窗滑不動的物理死結 */
-            .popup-overlay {
-                align-items: flex-start !important; /* 強制改為靠頂對齊，不居中，讓手機判定正確起點 */
-                padding: 20px 0;                    /* 提供上下安全活動空間 */
-                overflow-y: auto !important;        /* 允許外層遮罩進行滾動調度 */
-            }
-
             .popup-content {
-                width: 92%;            
-                max-height: none;                   /* 解開最高高度限制，改由內容自然延伸 */
-                height: auto;
-                overflow: visible !important;       /* 允許內容完整釋放 */
-                padding: 18px;
-                margin-bottom: 20px;
+                width: 92%;            /* 放大燈箱寬度，符合手機手指操作 */
+                max-height: 90vh;
+                padding: 15px;
             }
-            
             .media-viewer-container {
-                height: 240px;                      
+                height: 280px;         /* 適度壓縮手機端媒體預覽高度，騰出空間給下方的KPI判定文字 */
             }
         }
     </style>
@@ -367,7 +355,7 @@
         <div class="header-title-area">
             <h2>服務顧問接待流程 KPI 稽核管制看板</h2>
             <div class="header-meta">
-                負責人：<span>尚鵬內湖廠長 謝或翰</span> 系統編入時間：<span>2026-06-24</span>
+                負責人：<span>尚鵬內湖廠長 謝或翰</span> 系統編入時間：<span>2026-06-23</span>
                 <a href="https://drive.google.com/file/d/1MVC1RunZpz4L_Ed0PD8CyCm5YJCZeZqf/view?usp=sharing" target="_blank" class="global-kpi-btn">📋 檢視經銷商 KPI 總檢核表 (PDF)</a>
             </div>
         </div>
