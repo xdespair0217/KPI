@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA 服務顧問接待項目 KPI 稽核管制系統</title>
+    <style>
+        :root {
+            --bg-color: #060913;
+            --card-bg: rgba(19, 28, 46, 0.45);
+            --card-border: #13223c;
+            --accent-blue: #00e5ff;
+            --accent-orange: #ff9100;
+            --accent-green: #00e676;
+            --accent-purple: #d500f9;
+            --text-color: #cbd5e1;
+            --text-muted: #64748b;
+        }
+
+        html, body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #0d1527 0%, #060913 100%);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden; 
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            padding: 3vh 4vw; 
+        }
+
+        .system-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3vh;
+            border-bottom: 1px solid rgba(30, 45, 74, 0.4);
+            padding-bottom: 1.5vh;
+        }
+
+        .header-title-area h2 {
+            margin: 0;
+            font-size: 1.3rem; 
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+        }
+        .header-title-area h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 1.3rem;
+            background: var(--accent-blue);
+            margin-right: 10px;
+            box-shadow: 0 0 8px var(--accent-blue);
+        }
+
+        .header-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5vh;
+        }
+        .header-meta span { color: var(--accent-blue); margin-right: 12px; }
+
+        .critical-badge {
+            background: rgba(255, 145, 0, 0.08);
+            border: 1px solid rgba(255, 145, 0, 0.5);
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            color: #eee;
+        }
+        .critical-badge strong { color: var(--accent-orange); margin-right: 4px; }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 2.5vh 2.5vw; 
+            flex-grow: 1;
+            margin-bottom: 4vh;
+            max-width: 1400px; 
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .flow-node {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 4px;
+            padding: 1vh 1vw; 
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            position: relative;
+            height: 70%; 
+            align-self: center; 
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5vh;
+        }
+
+        .tag-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 1px 4px;
+            border-radius: 2px;
+            letter-spacing: 0.3px;
+        }
+        .tag-tg { background: rgba(0, 229, 255, 0.12); color: var(--accent-blue); border: 1px solid rgba(0, 229, 255, 0.2); }
+        .tag-dc { background: rgba(255, 145, 0, 0.12); color: var(--accent-orange); border: 1px solid rgba(255, 145, 0, 0.2); }
+        .tag-ex { background: rgba(0, 230, 118, 0.12); color: var(--accent-green); border: 1px solid rgba(0, 230, 118, 0.2); }
+        .tag-cl { background: rgba(213, 0, 249, 0.12); color: var(--accent-purple); border: 1px solid rgba(213, 0, 249, 0.2); }
+
+        .flow-node:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 12px rgba(0, 229, 255, 0.12);
+            background: rgba(19, 28, 46, 0.8);
+        }
+
+        .node-main {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .node-number {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-right: 0.6vw;
+        }
+
+        .node-text {
+            font-size: 0.78rem;
+            line-height: 1.35;
+            color: #b4c6ef;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+        .flow-node:hover .node-text {
+            color: #fff;
+        }
+
+        .node-footer-line {
+            height: 1px; 
+            width: 15px;
+            background: var(--card-border);
+            margin-top: 0.5vh;
+            transition: width 0.25s ease, background 0.25s ease;
+        }
+        .flow-node:hover .node-footer-line {
+            width: 100%;
+            background: var(--accent-blue);
+        }
+
+        .footer-notes {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(19, 28, 46, 0.3);
+            border: 1px solid rgba(30, 45, 74, 0.3);
+            padding: 1vh 1.5vw;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            border-radius: 4px;
+            max-width: 1400px;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        .footer-notes span strong { color: #fff; }
+
+        /* 燈箱外層固定架構 */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 6, 12, 0.88);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 彈出視窗容器 */
+        .popup-content {
+            background: #0f1626;
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 0 25px rgba(0, 229, 255, 0.2);
+            border-radius: 4px;
+            width: 85%;
+            max-width: 650px; /* 有PDF預覽時，稍微拓寬容器 */
+            max-height: 85vh; /* 限制最高高度 */
+            padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px; right: 16px;
+            background: none; border: none;
+            color: var(--text-muted); font-size: 1.3rem; cursor: pointer;
+            z-index: 1010;
+        }
+        .close-btn:hover { color: #fff; }
+
+        .popup-header {
+            border-bottom: 1px solid #1e2d4a;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        /* PDF 內嵌容器樣式 */
+        .pdf-viewer-container {
+            width: 100%;
+            height: 400px; /* 給予適當流暢的瀏覽高度 */
+            border: 1px solid #1e2d4a;
+            margin-top: 10px;
+            background: #000;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .pdf-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .kpi-criterion {
+            background: rgba(0, 230, 118, 0.03);
+            border-left: 3px solid var(--accent-green);
+            padding: 10px; margin-top: 12px;
+            font-size: 0.82rem;
+            color: #cbd5e1;
+            line-height: 1.45;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="system-header">
+        <div class="header-title-area">
+            <h2>服務顧問接待流程 KPI 稽核管制看板</h2>
+            <div class="header-meta">
+                負責人：<span>尚鵬內湖廠長 謝或翰</span> 系統編入時間：<span>2026-06-23</span>
+            </div>
+        </div>
+        <div class="critical-badge">
+            <strong>CRITICAL</strong> 發貨驗收單「原廠問題」+ 新凱「新問題」：訂單車必須須立即優先處理
+        </div>
+    </div>
+
+    <div class="matrix-grid">
+        
+        <div class="flow-node" onclick="openPopup('node1')">
+            <div class="node-header"><span class="tag-badge tag-tg">01 / TARGET</span></div>
+            <div class="node-main">
+                <div class="node-number">01.</div>
+                <div class="node-text">服務顧問了解每日、每月業績目標</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node2')">
+            <div class="node-header"><span class="tag-badge tag-tg">02 / TRAINING</span></div>
+            <div class="node-main">
+                <div class="node-number">02.</div>
+                <div class="node-text">標準服務流程演練</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node3')">
+            <div class="node-header"><span class="tag-badge tag-dc">03 / PRE-TRACK</span></div>
+            <div class="node-main">
+                <div class="node-number">03.</div>
+                <div class="node-text">預約車入廠電話提醒及記錄（如電話不通需發簡訊提醒並記錄）</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node4')">
+            <div class="node-header"><span class="tag-badge tag-ex">04 / PROTECTION</span></div>
+            <div class="node-main">
+                <div class="node-number">04.</div>
+                <div class="node-text">車輛接車時鋪設椅套、方向盤套、腳踏墊</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node5')">
+            <div class="node-header"><span class="tag-badge tag-ex">05 / DIGITAL</span></div>
+            <div class="node-main">
+                <div class="node-number">05.</div>
+                <div class="node-text">使用 iPad 平板接車及報價</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node6')">
+            <div class="node-header"><span class="tag-badge tag-ex">06 / STANDARDS</span></div>
+            <div class="node-main">
+                <div class="node-number">06.</div>
+                <div class="node-text">是否使用標準規範的文件（新版保養靜電貼紙、結帳信封袋等...）</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node7')">
+            <div class="node-header"><span class="tag-badge tag-cl">07 / POST-TRACK</span></div>
+            <div class="node-main">
+                <div class="node-number">07.</div>
+                <div class="node-text">出廠 3 日 DC 電訪追蹤並紀錄</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node8')">
+            <div class="node-header"><span class="tag-badge tag-dc">08 / SPEED_TEST</span></div>
+            <div class="node-main">
+                <div class="node-number">08.</div>
+                <div class="node-text">服務顧問於 30 秒內找出專案內容</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node9')">
+            <div class="node-header"><span class="tag-badge tag-ex">09 / ECO_SYSTEM</span></div>
+            <div class="node-main">
+                <div class="node-number">09.</div>
+                <div class="node-text">服務顧問可以進入 Link-e-entry 並了解功能</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node10')">
+            <div class="node-header"><span class="tag-badge tag-tg">10 / CAMPAIGN</span></div>
+            <div class="node-main">
+                <div class="node-number">10.</div>
+                <div class="node-text">服務顧問了解最新 PGU 活動或廠內自辦活動</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node11')">
+            <div class="node-header"><span class="tag-badge tag-ex">11 / APP_SYSTEM</span></div>
+            <div class="node-main">
+                <div class="node-number">11.</div>
+                <div class="node-text">服務顧問了解 My Peugeot APP 系統及客戶問題反映程序</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+        <div class="flow-node" onclick="openPopup('node12')">
+            <div class="node-header"><span class="tag-badge tag-cl">12 / FINALIZE</span></div>
+            <div class="node-main">
+                <div class="node-number">12.</div>
+                <div class="node-text">交車前車輛需洗車清潔完成</div>
+            </div>
+            <div class="node-footer-line"></div>
+        </div>
+
+    </div>
+
+    <div class="footer-notes">
+        <span>配分：<strong>0.05%</strong> ｜ 檢查項目共 12 項，容許 2 項不合格，3 項(含)以上不合格，本項全不合格。</span>
+        <span>DATA RETURED SECURED</span>
+    </div>
+
+    <div id="detailPopup" class="popup-overlay" onclick="closePopupOnOutside(event)">
+        <div class="popup-content">
+            <button class="close-btn" onclick="closePopup()">&times;</button>
+            <div id="popupBody"></div>
+        </div>
+    </div>
+
+    <script>
+        const nodeData = {
+            node1: { 
+                title: "01. 服務顧問了解每日、每月業績目標", 
+                desc: "<strong>指標設定：</strong>每天 $35,000 / 每月 $700,000 (不含保固)。", 
+                criterion: "<strong>【KPI 合格判定】</strong><br>SA能精準說出每日及每月目標。" 
+            },
+            node2: { 
+                title: "02. 標準服務流程演練", 
+                desc: "<strong>大標準服務流程：</strong>SA 須落實接待 SOP 核心對答、標準禮儀與流程演練。<br><br><a href='https://drive.google.com/file/d/14zCAZT3w8y69QujT0RYl-jAyf_MLB003/view?usp=sharing' target='_blank' style='display:inline-block; background:#1c3d31; color:#00e676; border:1px solid #00e676; padding:4px 10px; border-radius:3px; font-size:0.72rem; text-decoration:none;'>📥 下載原始檔案</a>", 
+                pdfUrl: "https://drive.google.com/file/d/14zCAZT3w8y69QujT0RYl-jAyf_MLB003/preview", // 轉為內嵌預報格式
+                criterion: "<strong>【KPI 合格判定】</strong><br>現場抽查演練流暢度，需符合隨後檢附之 PDF 標準規範指南。" 
+            },
+            node3: { title: "03. 預約車入廠電話提醒及記錄", desc: "<strong>防呆機制：</strong>預約日前 1~2 天聯繫。電話未通者，必須於 1 小時內補發提醒簡訊並存檔。", criterion: "<strong>【KPI 合格判定】</strong><br>DMS 系統內必須完整留存通聯軌跡與簡訊發送紀錄（內含時間與預約時段），無紀錄者判定不合格。" },
+            node4: { title: "04. 車輛接車時鋪設椅套、方向盤套、腳踏墊", desc: "<strong>核心防護：</strong>SA 身體碰觸車室內部前，必須第一時間完整鋪設防護三件套。", criterion: "<strong>【KPI 合格判定】</strong><br>現場抽查車輛移動時，三件套皆完備、乾淨且無破損。未套防護即坐進車內者一律不合格。" },
+            node5: { title: "05. 使用 iPad 平板接車及報價", desc: "<strong>數位核心：</strong>手持 iPad 進行外觀環車巡檢，並於系統導入報價套餐供客戶數位簽名。", criterion: "<strong>【KPI 合格判定】</strong><br>接待全程實施無紙化數位作業，外觀拍照與報價單皆有系統端即時存檔。仍使用紙張劃單者判定不合格。" },
+            node6: { title: "06. 是否使用標準規範的文件", desc: "<strong>文件整備：</strong>新版保養靜電貼紙（註明下次里程與日期）、結帳信封袋（工單與發票需整齊收納）。", criterion: "<strong>【KPI 合格判定】</strong><br>完工交車前，貼紙字跡工整定位，文件統一收入標準信封袋。散落或使用舊版文件者視為不合格。" }
+        };
+
+        function openPopup(nodeId) {
+            const data = nodeData[nodeId];
+            if (!data) {
+                document.getElementById('popupBody').innerHTML = `
+                    <div class="popup-header"><h3 style="margin:0; color:var(--accent-orange); font-size:0.95rem;">未定標節點</h3></div>
+                    <p style="color:var(--text-muted); font-size:0.8rem;">細節內容尚待設定。</p>
+                `;
+            } else {
+                // 判斷該節點是否有內嵌 PDF 需求
+                let pdfHtml = "";
+                if (data.pdfUrl) {
+                    pdfHtml = `
+                        <div class="pdf-viewer-container">
+                            <iframe src="${data.pdfUrl}" class="pdf-iframe" allow="autoplay"></iframe>
+                        </div>
+                    `;
+                }
+
+                document.getElementById('popupBody').innerHTML = `
+                    <div class="popup-header">
+                        <h3 style="margin:0; color:var(--accent-blue); font-size:0.95rem;">${data.title}</h3>
+                    </div>
+                    <p style="line-height:1.5; color:#a2b4d0; font-size:0.82rem; margin-bottom:10px;">${data.desc}</p>
+                    ${pdfHtml}
+                    <div class="kpi-criterion">${data.criterion}</div>
+                `;
+            }
+            document.getElementById('detailPopup').style.display = 'flex';
+        }
+        function closePopup() { document.getElementById('detailPopup').style.display = 'none'; }
+        function closePopupOnOutside(e) { if (e.target.id === 'detailPopup') closePopup(); }
+    </script>
+</body>
+</html>
