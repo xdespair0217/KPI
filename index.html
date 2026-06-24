@@ -61,7 +61,7 @@
             height: 1.3rem;
             background: var(--accent-blue);
             margin-right: 10px;
-            box-shadow: 0 0 8px var(--accent-blue);
+            box-Shadow: 0 0 8px var(--accent-blue);
         }
 
         .header-meta {
@@ -302,6 +302,63 @@
             color: #cbd5e1;
             line-height: 1.45;
         }
+
+        /* =======================================================
+          🔥 補強精準攻堅：徹底釋放手機端卡片與長燈箱的滾動條
+          =======================================================
+        */
+        @media screen and (max-width: 768px) {
+            html, body {
+                height: auto;          
+                overflow-y: auto !important; /* 確保主畫面在手機端可以順暢往下滑動 */
+            }
+            body {
+                padding: 2vh 3vw;      
+            }
+            .system-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+            .header-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .global-kpi-btn {
+                margin-left: 0;        
+            }
+            .matrix-grid {
+                grid-template-columns: 1fr; /* 手機端自動切換為一單列，完美舒緩空間 */
+                grid-template-rows: auto;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+            .flow-node {
+                height: auto;          
+                padding: 15px;
+            }
+            
+            /* 🎯 關鍵修復：破除長內容彈窗滑不動的物理死結 */
+            .popup-overlay {
+                align-items: flex-start !important; /* 強制改為靠頂對齊，不居中，讓手機判定正確起點 */
+                padding: 20px 0;                    /* 提供上下安全活動空間 */
+                overflow-y: auto !important;        /* 允許外層遮罩進行滾動調度 */
+            }
+
+            .popup-content {
+                width: 92%;            
+                max-height: none;                   /* 解開最高高度限制，改由內容自然延伸 */
+                height: auto;
+                overflow: visible !important;       /* 允許內容完整釋放 */
+                padding: 18px;
+                margin-bottom: 20px;
+            }
+            
+            .media-viewer-container {
+                height: 240px;                      
+            }
+        }
     </style>
 </head>
 <body>
@@ -310,7 +367,7 @@
         <div class="header-title-area">
             <h2>服務顧問接待流程 KPI 稽核管制看板</h2>
             <div class="header-meta">
-                負責人：<span>尚鵬內湖廠長 謝或翰</span> 系統編入時間：<span>2026-06-23</span>
+                負責人：<span>尚鵬內湖廠長 謝或翰</span> 系統編入時間：<span>2026-06-24</span>
                 <a href="https://drive.google.com/file/d/1MVC1RunZpz4L_Ed0PD8CyCm5YJCZeZqf/view?usp=sharing" target="_blank" class="global-kpi-btn">📋 檢視經銷商 KPI 總檢核表 (PDF)</a>
             </div>
         </div>
@@ -447,9 +504,7 @@
         <div class="popup-content">
             <button class="close-btn" onclick="closeImagePopup()">&times;</button>
             <div class="popup-header"><h3 style="margin:0; color:var(--accent-orange); font-size:0.95rem;">反映案例照片 (A04)</h3></div>
-            <div class="image-popup-container" id="globalImageContainer">
-                <!-- 動態加載，避免硬體預載過載 -->
-            </div>
+            <div class="image-popup-container" id="globalImageContainer"></div>
         </div>
     </div>
 
@@ -549,6 +604,7 @@
                       "<span id='mailSubject' style='color:#fff; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:3px; font-size:0.72rem; border:1px dashed #3b4f74;'>111AW-CAP5936-VR3FPHPY1SY541285-無法收到驗證碼</span> " +
                       "<button onclick='event.stopPropagation(); navigator.clipboard.writeText(\"111AW-CAP5936-VR3FPHPY1SY541285-無法收到驗證碼\"); alert(\"主旨格式已複製\");' style='background:#1e2d4a; color:#00e5ff; border:1px solid #00e5ff; padding:1px 5px; border-radius:3px; font-size:0.62rem; cursor:pointer; vertical-align:middle;'>📋 複製格式</button> " +
                       "<button onclick='event.stopPropagation(); window.location.href=\"mailto:benson.liu@pgu.com.tw?cc=austin.weng@pgu.com.tw&subject=\" + encodeURIComponent(\"111AW-CAP5936-VR3FPHPY1SY541285-無法收到驗證碼\") + \"&body=\" + encodeURIComponent(\"長官好，已將車主的所有資訊，添加至附件中請求長官支援。\");' style='background:#1a3d54; color:#00e5ff; border:1px solid #00e5ff; padding:1px 5px; border-radius:3px; font-size:0.62rem; cursor:pointer; vertical-align:middle;'>📧 自動產生通報郵件</button>", 
+                imgUrl: "placeholder_to_trigger_container",
                 criterion: "<strong>【KPI 合格判定】</strong><br>SA 抽查時須了解 APP 基礎功能操作，並熟知車主回報 3 步驟流程。寄送 PGU 通報郵件時，主旨與收件人規格須完全符合廠內規範。" 
             }
         };
@@ -563,14 +619,12 @@
             } else {
                 let mediaHtml = "";
                 if (data.pdfUrl) {
-                    // 動態生成 iframe，確保不預先載入
                     mediaHtml = `
                         <div class="media-viewer-container">
                             <iframe src="${data.pdfUrl}" class="pdf-iframe" allow="autoplay"></iframe>
                         </div>
                     `;
-                } else if (data.imgUrl) {
-                    // 動態生成圖片，避免手機背景記憶體過載
+                } else if (data.imgUrl && nodeId !== 'node11') {
                     mediaHtml = `
                         <div class="media-viewer-container">
                             <img src="${data.imgUrl}" class="embedded-img" alt="SOP 說明圖">
@@ -590,22 +644,20 @@
             document.getElementById('detailPopup').style.display = 'flex';
         }
 
-        // 徹底釋放 iframe 與內容記憶體，防止移動端當機
         function closePopup() { 
             const viewer = document.querySelector('.pdf-iframe');
-            if(viewer) viewer.src = "about:blank"; // 阻斷緩存
-            document.getElementById('popupBody').innerHTML = ""; // 物理清空 DOM 節點
+            if(viewer) viewer.src = "about:blank"; 
+            document.getElementById('popupBody').innerHTML = ""; 
             document.getElementById('detailPopup').style.display = 'none'; 
         }
         function closePopupOnOutside(e) { if (e.target.id === 'detailPopup') closePopup(); }
 
-        // 第二層大圖燈箱動態加載機制
         function openImagePopup() { 
             document.getElementById('globalImageContainer').innerHTML = `<img src="https://raw.githubusercontent.com/xdespair0217/KPI/main/A04.jpg" class="embedded-img" alt="車主案例照片">`;
             document.getElementById('imagePopup').style.display = 'flex'; 
         }
         function closeImagePopup() { 
-            document.getElementById('globalImageContainer').innerHTML = ""; // 物理銷毀大圖記憶體
+            document.getElementById('globalImageContainer').innerHTML = ""; 
             document.getElementById('imagePopup').style.display = 'none'; 
         }
         function closeImagePopupOnOutside(e) { if (e.target.id === 'imagePopup') closeImagePopup(); }
