@@ -525,11 +525,13 @@
             node4: { 
                 title: "04. 車輛接車時鋪設椅套、方向盤套、腳踏墊", 
                 desc: "<strong>核心防護：</strong>SA 接車前，必須第一時間完整鋪設防護三件套。", 
+                imgUrl: "https://raw.githubusercontent.com/xdespair0217/KPI/main/A06.jpg", // 🎯 確切嵌入 A06 照片
                 criterion: "<strong>【KPI 合格判定】</strong><br>現場抽查車輛移動時，三件套皆完備、乾淨且無破損。未套防護即坐進車內者一律不合格。" 
             },
             node5: { 
                 title: "05. 使用 iPad 平板接車及報價", 
                 desc: "<strong>數位核心：</strong>手持 iPad 進行外觀環車巡檢，並於系統導入報價套餐供客戶數位簽名。", 
+                imgUrl: "https://raw.githubusercontent.com/xdespair0217/KPI/main/A05.jpg", // 🎯 確切嵌入 A05 照片
                 criterion: "<strong>【KPI 合格判定】</strong><br>接待全程實施無紙化數位作業，外觀拍照與報價單皆有系統端即時存檔。" 
             },
             node6: { 
@@ -639,9 +641,8 @@
             document.getElementById('detailPopup').style.display = 'flex';
         }
 
-        // 🎯 核心修復點：採用絕對安全的虛擬 DOM 垃圾回收機制，保證第 02 項開關自如，且手機永不當機
         function closePopup() { 
-            document.getElementById('popupBody').innerHTML = ""; // 物理清空，直接斬斷記憶體堆疊
+            document.getElementById('popupBody').innerHTML = ""; 
             document.getElementById('detailPopup').style.display = 'none'; 
         }
         function closePopupOnOutside(e) { if (e.target.id === 'detailPopup') closePopup(); }
