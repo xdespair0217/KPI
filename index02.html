@@ -309,7 +309,7 @@
             <h2>服務經理／廠長 KPI 稽核管制看板</h2>
             <div class="header-meta">
                 負責人：<span>尚鵬內湖廠長 謝或翰</span> 系統更新時間：<span>2026-07-04</span>
-                <a href="#" class="global-kpi-btn">📋 廠長專用管理後台</a>
+                <a href="https://drive.google.com/file/d/1MVC1RunZpz4L_Ed0PD8CyCm5YJCZeZqf/view" target="_blank" class="global-kpi-btn">📋 檢視經銷商 KPI 總檢核表 (PDF)</a>
             </div>
         </div>
         <div class="critical-badge" id="countdownBadge">
@@ -319,7 +319,6 @@
 
     <div class="matrix-grid">
         
-        <!-- Row 1 -->
         <div class="flow-node" onclick="openPopup('node1')">
             <div class="node-header"><span class="tag-badge tag-tg">01 / TARGET</span></div>
             <div class="node-main">
@@ -347,7 +346,6 @@
             <div class="node-footer-line"></div>
         </div>
 
-        <!-- Row 2 -->
         <div class="flow-node" onclick="openPopup('node4')">
             <div class="node-header"><span class="tag-badge tag-dc">04 / PROJECT (AC13)</span></div>
             <div class="node-main">
@@ -375,7 +373,6 @@
             <div class="node-footer-line"></div>
         </div>
 
-        <!-- Row 3 -->
         <div class="flow-node" onclick="openPopup('node7')">
             <div class="node-header"><span class="tag-badge tag-cl">07 / CRC_CLOSE</span></div>
             <div class="node-main">
@@ -403,7 +400,6 @@
             <div class="node-footer-line"></div>
         </div>
 
-        <!-- Row 4 -->
         <div class="flow-node" onclick="openPopup('node10')">
             <div class="node-header"><span class="tag-badge tag-ex">10 / FLEET_CLEAN</span></div>
             <div class="node-main">
@@ -431,7 +427,6 @@
             <div class="node-footer-line"></div>
         </div>
 
-        <!-- Row 5 -->
         <div class="flow-node" onclick="openPopup('node13')">
             <div class="node-header"><span class="tag-badge tag-cl">13 / AUDIT_WORK</span></div>
             <div class="node-main">
@@ -459,7 +454,6 @@
             <div class="node-footer-line"></div>
         </div>
 
-        <!-- Row 6 -->
         <div class="flow-node" onclick="openPopup('node16')">
             <div class="node-header"><span class="tag-badge tag-tg">16 / 5S_ENVIRONMENT</span></div>
             <div class="node-main">
@@ -503,12 +497,20 @@
 
     <script>
         const nodeData = {
-            node1: { title: "01. 服務經理了解每月零件採購目標", desc: "管理核心：掌握當月總代理下達之零件採購目標量與達成率。", criterion: "【KPI 合格判定】廠長/經理須能即時口述或提供報表核對目標。" },
+            node1: { 
+                title: "01. 服務經理了解每月零件採購目標", 
+                desc: "管理核心：掌握當月總代理下達之零件採購目標量與達成率。<br><br>" +
+                      "<strong>相關管制文件下載：</strong><br>" +
+                      "📋 <a href='https://drive.google.com/file/d/1S64o5dUHVoqSz712Tx158HhkxwsmyuzO/view?usp=sharing' target='_blank' style='color:#00e5ff; text-decoration:none;'>經銷商通報 零件通字第115001號-附件一111 (PDF)</a><br>" +
+                      "📋 <a href='https://drive.google.com/file/d/1XXTnGOSIJKjgMWHyJmRXXNBgKQPgQCWY/view?usp=sharing' target='_blank' style='color:#00e5ff; text-decoration:none;'>111_113S2 (PDF)</a><br>" +
+                      "📊 <a href='https://docs.google.com/spreadsheets/d/1WZVc9AF1gpDupIZk8oxhz4oTFKl1011Q/edit?usp=sharing&ouid=102482519529125762788&rtpof=true&sd=true' target='_blank' style='color:#ff9100; text-decoration:none;'>星聯和尚鵬2026年度下半年零件採購目標 (Excel)</a>", 
+                criterion: "【KPI 合格判定】廠長/經理須能即時口述或提供報表核對目標，並確認已熟讀上述通報與目標核心數據。" 
+            },
             node2: { title: "02. 無超過 180 天以上未結工單（1D0 報表）", desc: "黃色高亮項目：嚴格監控逾期未結工單，確保週轉率。", imgUrl: "", criterion: "【KPI 合格判定】現場核對 1D0 報表，無 any 逾期工單殘留。" },
             node3: { title: "03. 服務經理提供每日業績進度報表", desc: "黃色高亮項目：包含SA接待業績、技師產值、以及全廠總營收之每日日報。", imgUrl: "https://raw.githubusercontent.com/xdespair0217/KPI/main/B01.png", criterion: "【KPI 合格判定】查看每日日報發送或產出軌跡，需確實更新。" },
             node4: { title: "04. 入廠車輛無忽略專案未施做", desc: "黃色高亮項目：透過稽核事件管控中心 AC13 報表實施防呆。", imgUrl: "", criterion: "【KPI 合格判定】比對 AC13 報表與實際入廠維修履歷，忽略率為零。" },
             node5: { title: "05. 服務廠人員變動立即於 DMS 更新", desc: "組織變更控管：確保 DMS 系統內人員權限與組織結構具備即時性。", imgUrl: "https://raw.githubusercontent.com/xdespair0217/KPI/main/B02.png", criterion: "【KPI 合格判定】現場人員異動與 DMS 系統同步率需達 100%。" },
-            node6: { title: "06. CRC 案件於 24 小時內回覆客戶", desc: "客訴第一時間反應：維護品牌滿意度之關鍵時效。", criterion: "【KPI 合格判定】稽核 CRC 系統回覆時間戳記，均在 24 小時內。" },
+            node6: { title: "06. CRC 案件於 24 小時內回覆客戶", desc: "客訴第一時間反應：維護 brand 滿意度之關鍵時效。", criterion: "【KPI 合格判定】稽核 CRC 系統回覆時間戳記，均在 24 小時內。" },
             node7: { title: "07. CRC 案件於 1 星期內結案", desc: "案件追蹤與終結：確保客戶抱怨問題獲得徹底解決。", criterion: "【KPI 合格判定】抽查 CRC 結案歷史，平均結案時效小於 7 日。" },
             node8: { title: "08. 代步車及鑰匙列冊集中管理", desc: "資產控管：維護代步車輛鑰匙之安全與拿取效率。", criterion: "【KPI 合格判定】檢查鑰匙保管箱與清冊，帳實必須相符。" },
             node9: { title: "09. 代步車借出表單完整度檢核", desc: "法律風險規避：借出表單填寫完整、駕照正反面副本影印附卷、客戶簽名。", criterion: "【KPI 合格判定】隨機抽查借車卷宗，上述三項缺一不可。" },
